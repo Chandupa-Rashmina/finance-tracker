@@ -17,6 +17,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -48,13 +49,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(
             content: Text('Welcome back ${user.email}!'),
             duration: const Duration(seconds: 3),
+            backgroundColor: Colors.green,
           ),
         );
       }
       
     } on FirebaseAuthException catch (e) {
+      // User-friendly error messages
+      String errorMessage = 'Login failed. Please try again.';
+      if (e.code == 'user-not-found') {
+        errorMessage = 'No account found with this email.';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (e.code == 'invalid-email') {
+        errorMessage = 'The email address is invalid.';
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message ?? 'Authentication failed'}')),
+        SnackBar(
+          content: Text(errorMessage),
+          duration: const Duration(seconds: 4),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -66,68 +82,101 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login to Coinwise'),
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'Welcome Back',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  if (!value.contains('@')) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 10),
+                const Text(
+                  'Sign in to continue managing your finances',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  textAlign: TextAlign.center,
                 ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _signIn,
-                      child: const Text('Sign In'),
+                const SizedBox(height: 30),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
                     ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterScreen(),
-                    ),
-                  );
-                },
-                child: const Text('Don\'t have an account? Register here'),
-              ),
-            ],
+                  ),
+                  obscureText: _obscurePassword,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 30),
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : ElevatedButton(
+                        onPressed: _signIn,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: const Text(
+                          'Sign In',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterScreen(),
+                            ),
+                          );
+                        },
+                  child: const Text('Don\'t have an account? Register here'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
