@@ -1,8 +1,9 @@
+import 'package:finance_tracker/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // ADD THIS IMPORT
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finance_tracker/providers/auth_provider.dart';
-import 'package:finance_tracker/views/register_screen.dart';
+import 'package:finance_tracker/screens/dashboard.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -31,13 +32,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authRepository = ref.read(authRepositoryProvider);
-      await authRepository.signInWithEmail(
+      final user = await authRepository.signInWithEmail(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
-      // Navigation is handled automatically by authStateProvider in SplashScreen
+      
+      // NAVIGATE DIRECTLY TO DASHBOARD AFTER SUCCESSFUL LOGIN
+      if (user != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) =>  DashboardScreen()),
+        );
+        
+        // SUCCESS FEEDBACK
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Welcome back ${user.email}!'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      
     } on FirebaseAuthException catch (e) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.message ?? 'Authentication failed'}')),
       );

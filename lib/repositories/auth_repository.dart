@@ -17,18 +17,33 @@ class AuthRepository {
   // Create a new user with an email and password.
   Future<User?> signUpWithEmail(String email, String password) async {
     try {
-      print('AuthRepository: Creating user with email: $email'); // DEBUG PRINT
+      print('AuthRepository: Creating user with email: $email');
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print(
-          'AuthRepository: User created: ${userCredential.user?.email}'); // DEBUG PRINT
+      
+      print('AuthRepository: User created: ${userCredential.user?.email}');
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      print('AuthRepository: Error - ${e.code}: ${e.message}'); // DEBUG PRINT
-      // Re-throw the exception so the UI can handle it (e.g., show an error message).
+      print('AuthRepository: Firebase Error - ${e.code}: ${e.message}');
       throw FirebaseAuthException(code: e.code, message: e.message);
+    } catch (e) {
+      print('AuthRepository: Unexpected error during signup: $e');
+      
+      // WORKAROUND: Check if user was actually created despite the error
+      // This handles the 'PigeonUserDetails' plugin bug
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser != null && currentUser.email == email) {
+        print('AuthRepository: User was created despite plugin error: ${currentUser.email}');
+        return currentUser;
+      }
+      
+      // If no user was created, re-throw as a FirebaseAuthException
+      throw FirebaseAuthException(
+        code: 'unknown-error', 
+        message: 'Registration failed due to an unexpected error'
+      );
     }
   }
 
@@ -42,6 +57,20 @@ class AuthRepository {
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       throw FirebaseAuthException(code: e.code, message: e.message);
+    } catch (e) {
+      print('AuthRepository: Unexpected error during signin: $e');
+      
+      // WORKAROUND: Check if user was actually logged in despite the error
+      final currentUser = _firebaseAuth.currentUser;
+      if (currentUser != null && currentUser.email == email) {
+        print('AuthRepository: User was logged in despite plugin error: ${currentUser.email}');
+        return currentUser;
+      }
+      
+      throw FirebaseAuthException(
+        code: 'unknown-error', 
+        message: 'Login failed due to an unexpected error'
+      );
     }
   }
 

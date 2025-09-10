@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finance_tracker/providers/auth_provider.dart';
-import 'package:finance_tracker/screens/dashboard.dart'; // ADD THIS IMPORT
+import 'package:finance_tracker/screens/dashboard.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -40,10 +40,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       print('Account created successfully: ${user?.email}');
       
-      // NEW: NAVIGATE TO DASHBOARD AFTER SUCCESSFUL REGISTRATION
+      // NAVIGATE TO DASHBOARD AFTER SUCCESSFUL REGISTRATION
       if (user != null) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) =>  DashboardScreen()),
+        );
+        
+        // SUCCESS FEEDBACK
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Account created successfully! Welcome ${user.email}'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
       
