@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:finance_tracker/providers/auth_provider.dart';
+import 'package:finance_tracker/screens/dashboard.dart'; // ADD THIS IMPORT
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -29,7 +30,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-    print('Attempting to create account...'); // DEBUG PRINT
+    print('Attempting to create account...');
 
     try {
       final authRepository = ref.read(authRepositoryProvider);
@@ -37,16 +38,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
-      print('Account created successfully: ${user?.email}'); // DEBUG PRINT
-      // Navigation is handled automatically by authStateProvider in SplashScreen
+      print('Account created successfully: ${user?.email}');
+      
+      // NEW: NAVIGATE TO DASHBOARD AFTER SUCCESSFUL REGISTRATION
+      if (user != null) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) =>  DashboardScreen()),
+        );
+      }
+      
     } on FirebaseAuthException catch (e) {
-      // Show error message
-      print('Firebase error: ${e.code} - ${e.message}'); // DEBUG PRINT
+      print('Firebase error: ${e.code} - ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.message ?? 'Registration failed'}')),
       );
     } catch (e) {
-      print('Unexpected error: $e'); // DEBUG PRINT
+      print('Unexpected error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('An unexpected error occurred')),
       );

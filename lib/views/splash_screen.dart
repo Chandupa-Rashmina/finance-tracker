@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ADD THIS IMPORT
 import 'package:finance_tracker/providers/auth_provider.dart';
 import 'package:finance_tracker/screens/dashboard.dart';
 import 'package:finance_tracker/views/login_screen.dart';
@@ -13,6 +14,23 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   bool _hasNavigated = false;
+
+  void _navigateBasedOnAuth(User? user, BuildContext context) {
+    if (_hasNavigated) return;
+    _hasNavigated = true;
+
+    if (user != null) {
+      // User is logged in, go to Dashboard
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => DashboardScreen()),
+      );
+    } else {
+      // No user is logged in, go to LoginScreen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,25 +52,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       ),
       // When the authentication state is known
       data: (user) {
-        // Prevent multiple navigations
-        if (!_hasNavigated) {
-          _hasNavigated = true;
-
-          // Navigate after a tiny delay to ensure the build is complete
-          Future.delayed(Duration.zero, () {
-            if (user != null) {
-              // User is logged in, go to Dashboard
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => DashboardScreen()),
-              );
-            } else {
-              // No user is logged in, go to LoginScreen
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
-            }
-          });
-        }
+        // Use a small delay to allow the splash screen to be visible
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateBasedOnAuth(user, context);
+        });
 
         // Show a simple splash screen while deciding where to navigate
         return const Scaffold(
