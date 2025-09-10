@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"coinwise-app","appId":"1:225576563826:android:b0d66008e15d9aaaea3eeb","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"coinwise-app","configurations":{"android":"1:225576563826:android:b0d66008e15d9aaaea3eeb","ios":"1:225576563826:ios:710f92a859b833b7ea3eeb"}}}}}}

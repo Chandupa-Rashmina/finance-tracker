@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "225576563826",
+    "project_id": "coinwise-app",
+    "storage_bucket": "coinwise-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225576563826:android:b0d66008e15d9aaaea3eeb",
+        "android_client_info": {
+          "package_name": "com.example.finance_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKTI1xMaa81qvR9LiLGKQ2vE5nLRb9Ni4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

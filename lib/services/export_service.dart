@@ -10,13 +10,13 @@ class ExportService {
   Future<File> exportToCSV() async {
     // Get all expenses
     final expenses = await _db.getExpenses();
-    
+
     // Create CSV data
     final List<List<dynamic>> csvData = [];
-    
+
     // Add header row
     csvData.add(['ID', 'Date', 'Type', 'Category', 'Description', 'Amount']);
-    
+
     // Add data rows
     for (var expense in expenses) {
       csvData.add([
@@ -28,17 +28,18 @@ class ExportService {
         expense['amount'].toString(),
       ]);
     }
-    
+
     // Convert to CSV string
     final csvString = const ListToCsvConverter().convert(csvData);
-    
+
     // Get directory for saving
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/finance_export_${DateTime.now().millisecondsSinceEpoch}.csv');
-    
+    final file = File(
+        '${directory.path}/finance_export_${DateTime.now().millisecondsSinceEpoch}.csv');
+
     // Write to file
     await file.writeAsString(csvString);
-    
+
     return file;
   }
 
@@ -46,20 +47,21 @@ class ExportService {
     final expenses = await _db.getExpenses();
     final incomeData = await _db.getMonthlyIncomeData();
     final expenseData = await _db.getMonthlyExpenseData();
-    
+
     final List<List<dynamic>> csvData = [];
-    
+
     // Header
     csvData.add(['Month', 'Income', 'Expenses', 'Balance']);
-    
+
     // Combine all months
-    final allMonths = {...incomeData.keys, ...expenseData.keys}.toList()..sort();
-    
+    final allMonths = {...incomeData.keys, ...expenseData.keys}.toList()
+      ..sort();
+
     for (var month in allMonths) {
       final income = incomeData[month] ?? 0;
       final expenses = expenseData[month] ?? 0;
       final balance = income - expenses;
-      
+
       csvData.add([
         month,
         income.toStringAsFixed(2),
@@ -67,11 +69,12 @@ class ExportService {
         balance.toStringAsFixed(2),
       ]);
     }
-    
+
     final csvString = const ListToCsvConverter().convert(csvData);
     final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/monthly_summary_${DateTime.now().millisecondsSinceEpoch}.csv');
-    
+    final file = File(
+        '${directory.path}/monthly_summary_${DateTime.now().millisecondsSinceEpoch}.csv');
+
     await file.writeAsString(csvString);
     return file;
   }
@@ -88,7 +91,7 @@ class ExportService {
         },
       ),
     );
-    
+
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
