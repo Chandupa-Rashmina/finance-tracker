@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:finance_tracker/data/database.dart';
 import 'package:finance_tracker/views/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
+import 'package:finance_tracker/services/local_database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   try {
-    // Initialize Firebase
+    // Initialize Firebase (for authentication)
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     
-    // Initialize local database (for now, we'll migrate to Firestore gradually)
-    final db = FinanceDatabase();
-    await db.loadData();
+    // Initialize Local Database (Hive)
+    await LocalDatabaseService.init();
     
     runApp(const ProviderScope(child: MyApp()));
   } catch (e) {
