@@ -13,102 +13,66 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  bool _hasNavigated = false;
+  @override
+  void initState() {
+    super.initState();
+    // Check auth state after a brief delay to ensure everything is initialized
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _checkAuthState();
+    });
+  }
 
-  void _navigateBasedOnAuth(User? user, BuildContext context) {
-    if (_hasNavigated) return;
-    _hasNavigated = true;
-
-    if (user != null) {
-      // User is logged in, go to Dashboard
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const DashboardScreen()),
-      );
-    } else {
-      // No user is logged in, go to LoginScreen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    }
+  void _checkAuthState() {
+    final authState = ref.read(authStateProvider);
+    
+    authState.when(
+      data: (user) {
+        if (user != null) {
+          // User is logged in, go to Dashboard
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          );
+        } else {
+          // No user is logged in, go to LoginScreen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
+      },
+      loading: () {
+        // Set a timeout to prevent infinite loading
+        Future.delayed(const Duration(seconds: 5), () {
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          }
+        });
+      },
+      error: (error, stackTrace) {
+        // On error, go to login screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Watch the authStateProvider. This will rebuild the widget when the auth state changes.
-    final authState = ref.watch(authStateProvider);
-
-    return authState.when(
-      // Show a loading indicator while checking the initial auth state
-      loading: () => const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text('Loading...'),
-            ],
-          ),
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text('Coinwise', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+            Text('Loading your financial data...'),
+          ],
         ),
       ),
-      // If an error occurs (e.g., no internet connection)
-      error: (error, stackTrace) => Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 50, color: Colors.red),
-                const SizedBox(height: 20),
-                const Text(
-                  'Connection Error',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Please check your internet connection and try again.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _hasNavigated = false;
-                    });
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      // When the authentication state is known
-      data: (user) {
-        // Use a small delay to allow the splash screen to be visible
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _navigateBasedOnAuth(user, context);
-        });
-
-        // Show a simple splash screen while deciding where to navigate
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 20),
-                Text(
-                  user != null ? 'Welcome back!' : 'Redirecting to login...',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
