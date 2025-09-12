@@ -1,6 +1,6 @@
+import 'package:finance_tracker/services/local_database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:finance_tracker/data/database.dart';
 
 class ExpenseChart extends StatefulWidget {
   @override
@@ -8,7 +8,7 @@ class ExpenseChart extends StatefulWidget {
 }
 
 class _ExpenseChartState extends State<ExpenseChart> {
-  final FinanceDatabase _db = FinanceDatabase();
+  final LocalDatabaseService _db = LocalDatabaseService();
   List<Map<String, dynamic>> _expenses = [];
   int _selectedIndex = -1;
 

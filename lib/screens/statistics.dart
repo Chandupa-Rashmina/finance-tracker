@@ -1,7 +1,7 @@
+import 'package:finance_tracker/services/local_database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_tracker/widgets/expense_chart.dart';
 import 'package:finance_tracker/widgets/monthly_chart.dart';
-import 'package:finance_tracker/data/database.dart';
 
 class StatisticsScreen extends StatefulWidget {
   @override
@@ -9,7 +9,7 @@ class StatisticsScreen extends StatefulWidget {
 }
 
 class _StatisticsScreenState extends State<StatisticsScreen> with SingleTickerProviderStateMixin {
-  final FinanceDatabase _db = FinanceDatabase();
+  final LocalDatabaseService _db = LocalDatabaseService();
   double _totalIncome = 0;
   double _totalExpenses = 0;
   late TabController _tabController;

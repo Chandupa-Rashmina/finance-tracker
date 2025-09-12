@@ -1,5 +1,5 @@
+import 'package:finance_tracker/services/local_database_service.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_tracker/data/database.dart';
 import 'package:finance_tracker/models/expense.dart';
 
 class AddExpenseScreen extends StatefulWidget {
@@ -9,7 +9,7 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
-  final FinanceDatabase _db = FinanceDatabase();
+  final LocalDatabaseService _db = LocalDatabaseService();
   
   // Form controllers
   final _amountController = TextEditingController();

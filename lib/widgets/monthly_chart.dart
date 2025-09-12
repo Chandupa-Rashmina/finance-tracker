@@ -1,6 +1,6 @@
+import 'package:finance_tracker/services/local_database_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:finance_tracker/data/database.dart';
 import 'package:intl/intl.dart';
 
 class MonthlyTrendChart extends StatefulWidget {
@@ -15,7 +15,7 @@ class MonthlyTrendChart extends StatefulWidget {
 enum ChartType { expenses, income, balance }
 
 class _MonthlyTrendChartState extends State<MonthlyTrendChart> {
-  final FinanceDatabase _db = FinanceDatabase();
+  final LocalDatabaseService _db = LocalDatabaseService();
   Map<String, double> _monthlyData = {};
   bool _isLoading = true;
 

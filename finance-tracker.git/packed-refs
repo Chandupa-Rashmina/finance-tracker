@@ -1,0 +1,6 @@
+# pack-refs with: peeled fully-peeled sorted 
+912a3a2da68b11279386b9b96b0c3ee235893614 refs/heads/develop
+e5d50abb82cd88f70affcb7472492530594a6ac2 refs/heads/firebase-integration
+912a3a2da68b11279386b9b96b0c3ee235893614 refs/heads/main
+dc0e549b4e663daeb7630644bc568369a970eeea refs/tags/v1.1.0
+6b0a45246409b90c9fc886e5a44aa1b9f093fb35 refs/tags/v1.2.0

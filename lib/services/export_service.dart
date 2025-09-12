@@ -1,11 +1,11 @@
 import 'dart:io';
+import 'package:finance_tracker/services/local_database_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
-import 'package:finance_tracker/data/database.dart';
 import 'package:flutter/material.dart'; // Add this import for BuildContext
 
 class ExportService {
-  final FinanceDatabase _db = FinanceDatabase();
+  final LocalDatabaseService _db = LocalDatabaseService();
 
   Future<File> exportToCSV() async {
     // Get all expenses

@@ -13,7 +13,9 @@ class DashboardScreen extends ConsumerWidget {
     final authRepository = ref.watch(authRepositoryProvider);
     final currentUser = authRepository.currentUser;
     final transactionsAsync = ref.watch(transactionsProvider);
-    final summary = ref.watch(transactionsSummaryProvider);
+    
+    // This is synchronous, no need for async handling
+    final summary = ref.read(transactionsSummaryProvider);
 
     return Scaffold(
       appBar: AppBar(
